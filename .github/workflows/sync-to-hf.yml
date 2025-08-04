@@ -1,28 +1,46 @@
+# 这个工作流的名称
 name: Sync to Hugging Face Hub
 
+# 触发工作流的条件
 on:
+  # 当有代码被推送到 release 分支时触发
   push:
     branches:
-      - release  # 或者您的主分支名，SillyTavern Fork 默认可能是 'release'
+      - release
+  
+  # 允许在 GitHub Actions 页面手动触发
+  workflow_dispatch:
 
+# 工作流包含的任务
 jobs:
+  # 定义一个名为 sync_to_hub 的任务
   sync_to_hub:
+    # 任务运行在最新的 Ubuntu 虚拟机上
     runs-on: ubuntu-latest
+    
+    # 任务执行的步骤
     steps:
+      # 第一步：检出（下载）当前仓库的代码
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # 获取所有git历史记录
+          # 获取完整的 Git 历史记录，这对于强制推送很重要
+          fetch-depth: 0
 
+      # 第二步：将代码推送到 Hugging Face Hub
       - name: Push to Hugging Face Hub
+        # 定义此步骤可用的环境变量
         env:
-          HF_SPACE_TARGET: "xiaoxiao666111/wu-fu-mi" # <--- 在这里修改为您自己的HF Space路径
+          # 在这里设置您的 Hugging Face Space 目标路径
+          # 请确保这个值是正确的 "用户名/Space名"
+          HF_SPACE_TARGET: "xiaoxiao666111/wu-fu-mi" 
+          
+        # 实际运行的命令
         run: |
-          # 将目标仓库添加为远程
-          # 使用 secrets 来安全地进行身份验证
-          git remote add hf "https://'${{ secrets.HF_USERNAME }}':'${{ secrets.HF_TOKEN }}'@huggingface.co/spaces/'${HF_SPACE_TARGET}'"
+          # 添加 Hugging Face Hub 作为名为 'hf' 的远程目标
+          # 使用修正后的、正确的语法来构建带有凭证的 URL
+          git remote add hf "https://'${{ secrets.HF_USERNAME }}':'${{ secrets.HF_TOKEN }}'@huggingface.co/spaces/${{ env.HF_SPACE_TARGET }}"
 
-          # 使用 --force 推送，因为我们要让HF Space完全镜像GitHub仓库
-          # 这会覆盖HF Space上的所有历史记录
+          # 强制将本地的当前 HEAD (即 release 分支的最新状态) 推送到 'hf' 远程的 'main' 分支
+          # 这会使 Hugging Face Space 的文件与您的 GitHub 仓库完全同步
           git push --force hf HEAD:refs/heads/main
-
