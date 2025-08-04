@@ -3,7 +3,7 @@ name: Sync to Hugging Face Hub
 on:
   push:
     branches:
-      - main  # 或者您的主分支名，SillyTavern Fork 默认可能是 'release'
+      - release  # 或者您的主分支名，SillyTavern Fork 默认可能是 'release'
 
 jobs:
   sync_to_hub:
