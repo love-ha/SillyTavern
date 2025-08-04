@@ -1,0 +1,28 @@
+name: Sync to Hugging Face Hub
+
+on:
+  push:
+    branches:
+      - main  # 或者您的主分支名，SillyTavern Fork 默认可能是 'release'
+
+jobs:
+  sync_to_hub:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # 获取所有git历史记录
+
+      - name: Push to Hugging Face Hub
+        env:
+          HF_SPACE_TARGET: "xiaoxiao666111/wu-fu-mi" # <--- 在这里修改为您自己的HF Space路径
+        run: |
+          # 将目标仓库添加为远程
+          # 使用 secrets 来安全地进行身份验证
+          git remote add hf "https://'${{ secrets.HF_USERNAME }}':'${{ secrets.HF_TOKEN }}'@huggingface.co/spaces/'${HF_SPACE_TARGET}'"
+
+          # 使用 --force 推送，因为我们要让HF Space完全镜像GitHub仓库
+          # 这会覆盖HF Space上的所有历史记录
+          git push --force hf HEAD:refs/heads/main
+
