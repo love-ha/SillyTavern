@@ -1,7 +1,7 @@
 # 工作流名称
 name: Sync to Hugging Face Hub
 
-# 触发条件：推送到release分支或手动触发
+# 触发条件
 on:
   push:
     branches:
@@ -13,25 +13,24 @@ jobs:
   sync-to-hub:
     runs-on: ubuntu-latest
     steps:
-      # 第一步：检出（下载）您的GitHub仓库代码
+      # 第一步：检出仓库代码
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      # 第二步：使用官方推荐的Action来同步
+      # 第二步：使用官方推荐的具体版本号来同步
       - name: Push to Hub
-        # 这是官方的自动化机器人
-        uses: huggingface/hub-action@v0
+        # 使用官方文档中明确的、更稳定的版本号 v0.5
+        uses: huggingface/hub-action@v0.5 
         with:
-          # 您的Hugging Face Space的完整ID (用户名/Space名)
-          # 请最后确认一遍这个值是否正确
+          # HF Space 的完整 ID
           repo_id: "xiaoxiao666111/wu-fu-mi"
 
-          # 目标仓库的类型，必须是 "space"
+          # 仓库类型
           repo_type: space
 
-          # 你的Hugging Face访问令牌，它会自动从Secrets中读取
+          # 访问令牌
           token: ${{ secrets.HF_TOKEN }}
           
-          # 强制推送，确保HF Space与GitHub完全一致
+          # 强制推送
           force_push: true
